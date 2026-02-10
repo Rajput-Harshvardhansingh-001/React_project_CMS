@@ -4,10 +4,7 @@ import com.cms.clientmanagementsystem.model.ClientData;
 import com.cms.clientmanagementsystem.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,9 +32,31 @@ public class ClientController {
         return clientService.getClients();
     }
 
-    @PutMapping("/update/{clientRegNos}")
-    public ResponseEntity<?> updateClient(@PathVariable String clientRegNo, @RequestBody ClientData clientData){
-        if(clientService.updateClient(clientRegNo , clientData)){
+    @GetMapping("/getByRegNo/{regNo}")
+    public ResponseEntity<?> getClientByRegNo(@PathVariable String regNo){
+        ClientData client = clientService.getClientByRegNo(regNo);
+        if(client != null){
+            return new ResponseEntity<>(client,HttpStatus.OK);
+        }
+       return new ResponseEntity<ClientData>(HttpStatus.NOT_FOUND);
+
+    }
+
+    @DeleteMapping("/delete/{clientRegNo}")
+    public ResponseEntity<?> deleteClient(@PathVariable String clientRegNo){
+        boolean isDel = clientService.deleteClientByRegNo(clientRegNo);
+        if(isDel){
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        }
+        else {
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+
+    }
+
+    @PutMapping("/update/{clientRegNo}")
+    public ResponseEntity<?> updateClient(@PathVariable("clientRegNo") String clientRegNo, @RequestBody ClientData clientData){
+        if(clientService.updateClient(clientRegNo, clientData)){
             return new ResponseEntity<>(clientService.getClientByRegNo(clientRegNo), HttpStatus.OK);
         }
         else {

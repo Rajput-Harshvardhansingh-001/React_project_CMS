@@ -8,6 +8,8 @@ const Client = () => {
 
   const [clientFormVisible, setClientFormVisible] = useState(false);
 
+  const [isEditMode, setEditMode] = useState(false);
+
   //to send the post api call we need object so for that also we need to create state with all fields as properties "" as String and 0 for number
   const [clientObj, setClientObj] = useState({
     clientPersonName: "",
@@ -21,8 +23,8 @@ const Client = () => {
   /*to get the data from html from to object's field we have to create dynamic function
   this function would have 2 param as 'event' and 'key' then it will use spread operator to change the object*/
 
-  const getClientFormData = (event, key) => {
-    setClientObj((obj) => ({ ...obj, [key]: event.target.value }));
+  const getClientFormData = (event,key) => {
+    setClientObj((obj) => ({ ...obj,[key]:event.target.value }))
   };
   /*to call api while page load, we use useEffect hook , it runs like constructor , and when any state change in page then it also run automaticaly */
   /*to call ony page load we put , [] in end of useEffect*/
@@ -60,25 +62,61 @@ const Client = () => {
     }
   };
 
-  // const updateClientCall = async (clientObj) => {
-  //   debugger;
-  //   try {
-  //     const clientup = await axios.put(
-  //       `http://localhost:8080/api/client/update/${clientObj.registrationNo}`,
-  //       clientObj,
-  //     );
-  //     if (clientup.status == 200) {
-  //       alert(`client data has been updated`);
-  //       getAPICall();
-  //     } else alert("error occured!");
-  //     debugger;
-  //   } catch (error) {
-  //     alert(error.message);
-  //   }
-  // };
+  const deleteClient = async (registrationNo) =>{
+    try {
+      let check = window.confirm("Are you sure want to delet this client having registration number "+registrationNo);
+      if(check){
+        const del = await axios.delete("http://localhost:8080/api/client/delete/"+registrationNo);
+        if(del.status == 202){
+          alert("client DELETED seccussfully");
+        }
+        else{
+          throw new Error("something goes wrong");
+        }
+      }
+      getAPICall();
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+
+  const editBtn = (clientObj) =>{
+    setClientObj(clientObj);
+    setClientFormVisible(true);
+    setEditMode(true);
+  }
+
+  const updateClient = async (clientObj) => {
+    //debugger;
+    
+    try {
+      const clientup = await axios.put(
+        "http://localhost:8080/api/client/update/"+clientObj.registrationNo,
+        clientObj,
+      );
+      if (clientup.status == 200) {
+        alert("client data has been updated");
+        getAPICall();
+      } else alert("error occured!");
+      debugger;
+    } catch (error) {
+      alert(error.message);
+    }
+  };
 
   const clientFormVisibility = () => {
+    setClientObj({
+    clientPersonName: "",
+    companyName: "",
+    city: "",
+    gstNo: "",
+    contactNo: "",
+    registrationNo: "",
+    empStrength:"",
+    address:""
+    });
     setClientFormVisible(true);
+    setEditMode(false);
   };
 
   return (
@@ -127,10 +165,10 @@ const Client = () => {
                           <td>{item.registrationNo}</td>
                           <td>
                             <div className="d-flex flex-row gap-3">
-                              <button className="btn btn-danger btn-sm danger">
+                              <button className="btn btn-danger btn-sm danger" onClick={()=>{deleteClient(item.registrationNo)}}>
                                 delete
                               </button>
-                              <button className="btn btn-info btn-sm green">
+                              <button className="btn btn-info btn-sm green" onClick={()=>{editBtn(item)}}>
                                 update
                               </button>
                             </div>
@@ -167,10 +205,10 @@ const Client = () => {
                     <label className="form-label">Contact Person Name</label>
                     <input
                       type="text"
-                      placeholder="person name"
+                      placeholder="John Duo"
                       value={clientObj.clientPersonName}
                       onChange={(event) => {
-                        getClientFormData(event, "clientPersonName");
+                        getClientFormData(event,'clientPersonName');
                       }}
                       className="form-control"
                     />
@@ -180,9 +218,10 @@ const Client = () => {
                     <label className="form-label">Company Name</label>
                     <input
                       type="text"
+                      placeholder="XYZ Pvt. Ltd."
                       value={clientObj.companyName}
                       onChange={(event) => {
-                        getClientFormData(event, "companyName");
+                        getClientFormData(event,'companyName');
                       }}
                       className="form-control"
                     />
@@ -192,15 +231,16 @@ const Client = () => {
                 <div className="row mb-3">
                   <div className="col-md-6">
                     <label className="form-label">
-                      Registration No. (immutable)
+                      Registration No. (do not change!)
                     </label>
                     <input
                       type="text"
                       value={clientObj.registrationNo}
                       onChange={(event) => {
-                        getClientFormData(event, "registrationNo");
+                        getClientFormData(event,'registrationNo');
                       }}
                       className="form-control"
+                      readOnly={isEditMode}
                     />
                   </div>
                   <div className="col-md-6">
@@ -208,8 +248,9 @@ const Client = () => {
                     <input
                       type="text"
                       value={clientObj.city}
+                      placeholder="example: Delhi"
                       onChange={(event) => {
-                        getClientFormData(event, "city");
+                        getClientFormData(event,'city');
                       }}
                       className="form-control"
                     />
@@ -221,9 +262,10 @@ const Client = () => {
                     <label className="form-label">Contact No.</label>
                     <input
                       type="tel"
+                      placeholder="example: 987654321"
                       value={clientObj.contactNo}
                       onChange={(event) => {
-                        getClientFormData(event, "contactNo");
+                        getClientFormData(event,'contactNo');
                       }}
                       className="form-control"
                     />
@@ -232,9 +274,10 @@ const Client = () => {
                     <label className="form-label">GST No.</label>
                     <input
                       type="text"
+                      placeholder="example: gst123456789"
                       value={clientObj.gstNo}
                       onChange={(event) => {
-                        getClientFormData(event, "gstNo");
+                        getClientFormData(event,'gstNo');
                       }}
                       className="form-control"
                     />
@@ -246,6 +289,7 @@ const Client = () => {
                   <textarea
                     className="form-control"
                     value={clientObj.empStrength}
+                    placeholder="example: I am hardworking in corporative domain"
                     onChange={(event) => {
                       getClientFormData(event, "empStrength");
                     }}
@@ -257,6 +301,7 @@ const Client = () => {
                   <label className="form-label">Address</label>
                   <textarea
                     value={clientObj.address}
+                    placeholder="example: HoNo.123, Saket, Delhi-100023, India"
                     className="form-control"
                     onChange={(event) => {
                       getClientFormData(event, "address");
@@ -266,13 +311,18 @@ const Client = () => {
                 </div>
 
                 <div className="d-grid gap-2">
-                  <button
-                    type="button"
-                    onClick={postAPICall}
-                    className="btn btn-success"
-                  >
+                  {
+                    !isEditMode &&                   
+                    <button type="button" onClick={postAPICall} className="btn btn-success">
                     Add Client
                   </button>
+                  }
+                  {
+                    isEditMode && 
+                    <button className="btn btn-warning" type="button" onClick={()=>{updateClient(clientObj)}}>
+                    Update Client
+                  </button>
+                  }
                   <button type="button" className="btn btn-secondary">
                     Clear Form
                   </button>

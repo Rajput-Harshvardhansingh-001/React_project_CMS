@@ -44,8 +44,16 @@ public class ClientService {
 
     }
 
+    public boolean deleteClientByRegNo(String clientRegNo){
+        if(!clientRegNo.isEmpty()){
+            clientRepository.deleteByRegistrationNo(clientRegNo);
+        }
+        return true;
+    }
+
+
     public ClientData getClientByRegNo(String reg){
-        return clientRepository.findByRegistrationNo(reg);
+        return clientRepository.findByRegistrationNo(reg).orElse(null);
     }
 
     @Transactional
@@ -53,26 +61,19 @@ public class ClientService {
         if (clientRegNo == null) {
             return false;
         }
-        ClientData getOldClient = clientRepository.findByRegistrationNo(clientRegNo);
-        if (getOldClient.getClientPersonName().isBlank()) {
-            try {
-                throw new NullPointerException("No such client is exist");
-            } catch (NullPointerException e) {
-                System.err.println(e.getMessage());
-                return  false;
-            }
-        }
-        else {
-            getOldClient.setClientPersonName(newClientData.getClientPersonName());
-            getOldClient.setCompanyName(newClientData.getCompanyName());
-            getOldClient.setCity(newClientData.getCity());
-            getOldClient.setAddress(newClientData.getAddress());
-            getOldClient.setContactNo(newClientData.getContactNo());
-            getOldClient.setEmpStrength(newClientData.getEmpStrength());
+        ClientData getOldClient = clientRepository.findByRegistrationNo(clientRegNo).orElse(null);
+
+
+        if(getOldClient != null){
+            getOldClient.setClientPersonName( newClientData.getClientPersonName() != null && !newClientData.getClientPersonName().isEmpty()  ? newClientData.getClientPersonName() : getOldClient.getClientPersonName());
+            getOldClient.setCompanyName(newClientData.getCompanyName() != null && !newClientData.getCompanyName().isEmpty()  ? newClientData.getCompanyName(): getOldClient.getCompanyName());
+            getOldClient.setCity(newClientData.getCity() != null && !newClientData.getCity().isEmpty()   ? newClientData.getCity() : getOldClient.getCity());
+            getOldClient.setAddress(newClientData.getAddress() !=null && !newClientData.getAddress().isEmpty()   ? newClientData.getAddress(): getOldClient.getAddress());
+            getOldClient.setContactNo(newClientData.getContactNo() != null && !newClientData.getContactNo().isEmpty()   ? newClientData.getContactNo(): getOldClient.getContactNo());
+            getOldClient.setEmpStrength(newClientData.getEmpStrength() != null && newClientData.getEmpStrength().isEmpty() ? newClientData.getEmpStrength(): getOldClient.getEmpStrength());
             clientRepository.save(getOldClient);
             return true;
         }
-
-
+        return false;
     }
 }
