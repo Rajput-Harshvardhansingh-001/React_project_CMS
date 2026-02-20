@@ -1,5 +1,8 @@
 import "./App.css";
+import AddClientInProject from "./Pages/AddClientInProject";
 import Client from "./Pages/Client";
+import ClientProjects from "./Pages/ClientProjects";
+import CreateProject from "./Pages/CreateProject";
 import Employee from "./Pages/Employee";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
@@ -45,9 +48,9 @@ function App() {
                   </Link>
                 </li>
                 <li className="nav-item" style={{ marginTop: "-12px" }}>
-                  <a className="nav-link" href="javascript:void(0)">
-                    Link
-                  </a>
+                  <Link className="nav-link active" to={"/clientprojects"}>
+                    Client'sProjects
+                  </Link>
                 </li>
               </ul>
               <form className="d-flex">
@@ -63,6 +66,7 @@ function App() {
             </div>
           </div>
         </nav>
+        <h2 className="mb-4 mt-4 text-center">Client Management System</h2>
         {/*Link is for Naviagtion of route*/}
         {/* <Link to={"/client"}>client_here</Link>{" "}
         
@@ -72,6 +76,9 @@ function App() {
           <Route path="" element={<Employee />}></Route>
           <Route path="client" element={<Client></Client>}></Route>
           <Route path="employee" element={<Employee />}></Route>
+          <Route path="clientprojects" element={<ClientProjects/>}></Route>
+          <Route path="createproject" element={<CreateProject/>}></Route>
+          <Route path="addclientinproject" element={<AddClientInProject/>}></Route>
         </Routes>
       </BrowserRouter>
     </div>

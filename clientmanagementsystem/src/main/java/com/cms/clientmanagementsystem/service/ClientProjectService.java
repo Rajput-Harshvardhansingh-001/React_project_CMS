@@ -14,6 +14,9 @@ public class ClientProjectService {
     @Autowired
     ProjectRepository projectRepository;
 
+    @Autowired
+    ClientService clientService;
+
     @Transactional
     public boolean addNewProject(ClientProjects projectData){
         if(projectData!=null){
@@ -25,10 +28,16 @@ public class ClientProjectService {
     }
 
     @Transactional
-    public boolean addClientInProjects(ClientProjects project, ClientData clientData){
-        if(project!=null){
-
-            return true;
+    public boolean addNewClientInProjects(String projectTitle, ClientData clientData){
+        if(!projectTitle.isEmpty() && clientData!=null){
+            ClientProjects project = projectRepository.findByProjectTitle(projectTitle);
+            if(project!=null){
+                if(clientService.addNClient(clientData)){
+                    project.getClients().add(clientData);
+                    projectRepository.save(project);
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -39,6 +48,14 @@ public class ClientProjectService {
 
     public ClientProjects getProjectByTitle(String title){
         return projectRepository.findByProjectTitle(title);
+    }
+
+    public List<ClientData> getClientsByTitle(String title){
+        if(!title.isEmpty()){
+            ClientProjects project = projectRepository.findByProjectTitle(title);
+            return project.getClients().isEmpty() ? null:project.getClients();
+        }
+        return  null;
     }
 
     @Transactional

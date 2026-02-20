@@ -3,6 +3,7 @@ import axios from "axios";
 import { eventWrapper } from "@testing-library/user-event/dist/utils";
 import { data } from "react-router-dom";
 import { cleanup } from "@testing-library/react";
+import { getAllClients } from "../service/Master";
 const Client = () => {
   const [clientList, setClientList] = useState([]);
 
@@ -38,8 +39,14 @@ const Client = () => {
     or when a hook change state on any variable then it rerender whole component*/
 
   const getAPICall = async () => {
-    const clientData = await axios.get("http://localhost:8080/api/client");
-    setClientList(clientData.data);
+    //this is promise type so it use callback, this execute after calling itself
+    debugger;
+    getAllClients().then((data)=>{
+      debugger;
+      setClientList(data);
+    })
+    //const clientData = await axios.get("http://localhost:8080/api/client");
+    
   };
 
   const postAPICall = async () => {
@@ -54,7 +61,7 @@ const Client = () => {
         alert("client added succussfully");
         getAPICall();
       } else {
-        alert("this is problem buddy to send the data ! ja Check kr");
+        alert("this is problem to send the data !");
       }
     } catch (error) {
       debugger;
@@ -120,8 +127,7 @@ const Client = () => {
   };
 
   return (
-    <div className="container-fluid py-4">
-      <h2 className="mb-4 text-center">Client Management System</h2>
+    <div className="container-fluid py-4 bg-light">
       {/* Client List */}
       <div className="d-flex flex-row justify-content-center  w-100 row g-4">
         <div className={clientFormVisible === true ? "col-7" : "col-12"}>

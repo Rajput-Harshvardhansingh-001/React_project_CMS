@@ -1,5 +1,6 @@
 package com.cms.clientmanagementsystem.controller;
 
+import com.cms.clientmanagementsystem.model.ClientData;
 import com.cms.clientmanagementsystem.model.ClientProjects;
 import com.cms.clientmanagementsystem.service.ClientProjectService;
 import com.cms.clientmanagementsystem.service.ClientService;
@@ -28,12 +29,30 @@ public class ClientProjectController {
         return clientProjectService.getProjectByTitle(title);
     }
 
+    @GetMapping("/getClientsByProjectTitle/{title}")
+    public ResponseEntity<?> getClientsByProjectTitle(@PathVariable("title") String title){
+        List<ClientData> clientsOfProject = clientProjectService.getClientsByTitle(title);
+        if(clientsOfProject != null && !clientsOfProject.isEmpty()){
+            return new ResponseEntity<>(clientsOfProject,HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+
     @PostMapping("/addProject")
     public ResponseEntity<?> addNewProject(@RequestBody ClientProjects projectData){
         if(clientProjectService.addNewProject(projectData)){
             return new ResponseEntity<ClientProjects>(projectData,HttpStatus.OK);
         }
         return new ResponseEntity<ClientProjects>(projectData,HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping("/addClientInProject/{projectTitle}")
+    public ResponseEntity<?> addNewClientInProject(@PathVariable("projectTitle") String projectTitle, @RequestBody ClientData clientData){
+        if(clientProjectService.addNewClientInProjects(projectTitle, clientData)){
+            return new ResponseEntity<ClientData>(clientData,HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @DeleteMapping("delete/{title}")

@@ -25,27 +25,34 @@ public class ClientProjects {
     @Id
     private ObjectId clientProjectId;
     @NotNull
+    @NonNull
     private String leadByEmpId;
 
     @NotNull
+    @NonNull
     @Indexed(unique = true)
     private String projectTitle;
 
     @NotNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-mm-dd")
+    @NonNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date startDate;
 
     @NotNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-mm-dd")
+    @NonNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date excpectedDate;
 
     @NotNull
+    @NonNull
     private String projectCost;
 
     @NotNull
+    @NonNull
     private String projectDetails;
 
     @NotNull
+    @NonNull
     private String contactPersonEmail;
     @DBRef
     private List<ClientData> clients = new ArrayList<>();
